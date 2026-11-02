@@ -8,9 +8,9 @@ const ui = {
   audioFile: byId("audioFile"), audioPlayer: byId("audioPlayer"),
   presets: Array.from(document.querySelectorAll(".preset")),
   pitch: byId("pitch"), echo: byId("echo"), reverb: byId("reverb"),
-  distortion: byId("distortion"), pitchValue: byId("pitchValue"),
+  distortion: byId("distortion"), lowCut: byId("lowCut"), highCut: byId("highCut"), toneAmount: byId("toneAmount"), modSpeed: byId("modSpeed"), modDepth: byId("modDepth"), delayTime: byId("delayTime"), outputVolume: byId("outputVolume"), pitchValue: byId("pitchValue"),
   echoValue: byId("echoValue"), reverbValue: byId("reverbValue"),
-  distortionValue: byId("distortionValue"), resetButton: byId("resetButton"),
+  distortionValue: byId("distortionValue"), lowCutValue: byId("lowCutValue"), highCutValue: byId("highCutValue"), toneAmountValue: byId("toneAmountValue"), modSpeedValue: byId("modSpeedValue"), modDepthValue: byId("modDepthValue"), delayTimeValue: byId("delayTimeValue"), outputVolumeValue: byId("outputVolumeValue"), resetButton: byId("resetButton"),
   recordButton: byId("recordButton"), downloadButton: byId("downloadButton"),
   recordTime: byId("recordTime"), toast: byId("toast"), engineLabel: byId("engineLabel"),
   noiseReduction: byId("noiseReduction"), softGate: byId("softGate"), autoLevel: byId("autoLevel"),
@@ -330,6 +330,13 @@ function updateSliderLabels() {
   ui.echoValue.textContent = ui.echo.value + "%";
   ui.reverbValue.textContent = ui.reverb.value + "%";
   ui.distortionValue.textContent = ui.distortion.value + "%";
+  ui.lowCutValue.textContent = ui.lowCut.value + " Hz";
+  ui.highCutValue.textContent = Number(ui.highCut.value) >= 18000 ? "Máximo" : ui.highCut.value + " Hz";
+  ui.toneAmountValue.textContent = ui.toneAmount.value + " dB";
+  ui.modSpeedValue.textContent = ui.modSpeed.value + " Hz";
+  ui.modDepthValue.textContent = ui.modDepth.value + "%";
+  ui.delayTimeValue.textContent = ui.delayTime.value + " ms";
+  ui.outputVolumeValue.textContent = ui.outputVolume.value + "%";
 }
 
 function updateEffects() {
@@ -349,6 +356,13 @@ ui.monitorVolumeValue.textContent = ui.monitorVolume.value + "%";
   delayFeedback.gain.setTargetAtTime(Number(ui.echo.value) / 100 * 0.34, audioContext.currentTime, 0.025);
   reverbWet.gain.setTargetAtTime(Number(ui.reverb.value) / 100 * 0.72, audioContext.currentTime, 0.025);
   shaper.curve = makeDistortionCurve(Number(ui.distortion.value) / 100);
+  highpass.frequency.setTargetAtTime(Number(ui.lowCut.value), audioContext.currentTime, 0.03);
+  lowpass.frequency.setTargetAtTime(Number(ui.highCut.value), audioContext.currentTime, 0.03);
+  toneFilter.gain.setTargetAtTime(Number(ui.toneAmount.value), audioContext.currentTime, 0.03);
+  robotLfo.frequency.setTargetAtTime(Number(ui.modSpeed.value), audioContext.currentTime, 0.03);
+  robotDepth.gain.setTargetAtTime(Number(ui.modDepth.value) / 100 * 0.45, audioContext.currentTime, 0.03);
+  delayNode.delayTime.setTargetAtTime(Number(ui.delayTime.value) / 1000, audioContext.currentTime, 0.03);
+  masterGain.gain.setTargetAtTime(Number(ui.outputVolume.value) / 100, audioContext.currentTime, 0.03);
   applyLevelSettings();
   applyMonitorSettings();
 }
@@ -366,6 +380,12 @@ function applyPreset(name) {
   ui.echo.value = String(config.echo);
   ui.reverb.value = String(config.reverb);
   ui.distortion.value = String(config.distortion);
+  ui.lowCut.value = String(config.highpass ?? 80);
+  ui.highCut.value = String(config.lowpass ?? 18000);
+  ui.toneAmount.value = String(config.filterGain ?? (config.deep ? 6 : config.radio ? -13 : 0));
+  ui.modSpeed.value = String(config.robotHz ?? 26);
+  ui.modDepth.value = String(Math.round((config.robotDepth ?? 0) / 0.45 * 100));
+  ui.delayTime.value = String(Math.round((config.delayTime ?? 0.28) * 1000));
   selectPresetButton(name);
 
   if (audioContext) {
@@ -593,7 +613,7 @@ ui.presets.forEach((button) => {
   button.addEventListener("click", () => applyPreset(button.dataset.preset));
 });
 
-[ui.pitch, ui.echo, ui.reverb, ui.distortion].forEach((slider) => {
+[ui.pitch, ui.echo, ui.reverb, ui.distortion, ui.lowCut, ui.highCut, ui.toneAmount, ui.modSpeed, ui.modDepth, ui.delayTime, ui.outputVolume].forEach((slider) => {
   slider.addEventListener("input", markCustom);
 });
 
@@ -618,7 +638,7 @@ ui.noiseThreshold.addEventListener("input", () => {
 });
 ui.liveMonitor.addEventListener("change", applyMonitorSettings);
 ui.monitorVolume.addEventListener("input", applyMonitorSettings);
-ui.resetButton.addEventListener("click", () => applyPreset("normal"));
+ui.resetButton.addEventListener("click", () => { ui.outputVolume.value = "78"; applyPreset("normal"); updateEffects(); });
 ui.recordButton.addEventListener("click", () => {
   if (mediaRecorder && mediaRecorder.state === "recording") stopRecording();
   else startRecording();
