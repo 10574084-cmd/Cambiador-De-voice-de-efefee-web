@@ -12,13 +12,19 @@ const ui = {
   echoValue: byId("echoValue"), reverbValue: byId("reverbValue"),
   distortionValue: byId("distortionValue"), resetButton: byId("resetButton"),
   recordButton: byId("recordButton"), downloadButton: byId("downloadButton"),
-  recordTime: byId("recordTime"), toast: byId("toast"), engineLabel: byId("engineLabel")
+  recordTime: byId("recordTime"), toast: byId("toast"), engineLabel: byId("engineLabel"),
+  noiseReduction: byId("noiseReduction"), autoLevel: byId("autoLevel"),
+  liveMonitor: byId("liveMonitor"), inputLevel: byId("inputLevel"),
+  inputLevelValue: byId("inputLevelValue"), monitorVolume: byId("monitorVolume"),
+  monitorVolumeValue: byId("monitorVolumeValue")
 };
 
 let audioContext = null;
 let inputBus = null;
+let inputGain = null;
 let pitchNode = null;
 let highpass = null;
+let lowpass = null;
 let toneFilter = null;
 let shaper = null;
 let tremoloGain = null;
@@ -28,6 +34,10 @@ let delayWet = null;
 let convolver = null;
 let reverbWet = null;
 let masterGain = null;
+let limiter = null;
+let monitorGain = null;
+let robotLfo = null;
+let robotDepth = null;
 let recordDestination = null;
 let analyser = null;
 let micStream = null;
@@ -52,8 +62,15 @@ const presets = {
   cave:   { pitch: 0, echo: 34, reverb: 84, distortion: 0 },
   helium: { pitch: 8, echo: 0, reverb: 4, distortion: 0 },
   deep:   { pitch: -7, echo: 4, reverb: 7, distortion: 0, deep: true },
-  alien:  { pitch: 5, echo: 24, reverb: 28, distortion: 14 }
-};
+  alien:      { pitch: 5, echo: 24, reverb: 28, distortion: 14, robotHz: 6, robotDepth: 0.12, lowpass: 9000 },
+  chipmunk:   { pitch: 12, echo: 0, reverb: 3, distortion: 0, highpass: 100, lowpass: 12000 },
+  monster:    { pitch: -10, echo: 8, reverb: 22, distortion: 18, deep: true, highpass: 65, lowpass: 5200 },
+  telephone:  { pitch: 0, echo: 0, reverb: 0, distortion: 8, highpass: 420, lowpass: 3200, filterType: "peaking", filterFrequency: 1600, filterGain: 5 },
+  underwater: { pitch: -2, echo: 14, reverb: 22, distortion: 0, highpass: 70, lowpass: 780, filterType: "peaking", filterFrequency: 420, filterGain: -5 },
+  ghost:      { pitch: -5, echo: 45, reverb: 66, distortion: 0, highpass: 60, lowpass: 8200 },
+  megaphone:  { pitch: 0, echo: 0, reverb: 0, distortion: 28, highpass: 500, lowpass: 4300, filterType: "peaking", filterFrequency: 1300, filterGain: 6 },
+  chorus:     { pitch: 0, echo: 22, reverb: 42, distortion: 0, delayTime: 0.045, highpass: 70, lowpass: 11000 },
+  cyborg:     { pitch: 2, echo: 15, reverb: 8, distortion: 48, robotHz: 34, robotDepth: 0.16, highpass: 140, lowpass: 6500 }
 
 function showToast(message) {
   ui.toast.textContent = message;
@@ -105,7 +122,10 @@ async function ensureAudio() {
   if (!AudioContextClass) throw new Error("Este navegador no admite Web Audio.");
   audioContext = new AudioContextClass();
 
+  inputGain = audioContext.createGain();
+  inputGain.gain.value = Number(ui.inputLevel.value) / 100;
   inputBus = audioContext.createGain();
+  inputGain.connect(inputBus);
   analyser = audioContext.createAnalyser();
   analyser.fftSize = 1024;
   inputBus.connect(analyser);
@@ -132,6 +152,12 @@ async function ensureAudio() {
   toneFilter.type = "lowshelf";
   toneFilter.frequency.value = 180;
   toneFilter.gain.value = 0;
+  toneFilter.Q.value = 0.8;
+
+  lowpass = audioContext.createBiquadFilter();
+  lowpass.type = "lowpass";
+  lowpass.frequency.value = 18000;
+  lowpass.Q.value = 0.7;
 
   shaper = audioContext.createWaveShaper();
   shaper.oversample = "4x";
@@ -153,13 +179,30 @@ async function ensureAudio() {
   reverbWet.gain.value = 0;
 
   masterGain = audioContext.createGain();
-  masterGain.gain.value = 0.92;
+  masterGain.gain.value = 0.78;
+  limiter = audioContext.createDynamicsCompressor();
+  limiter.threshold.value = -7;
+  limiter.knee.value = 3;
+  limiter.ratio.value = 12;
+  limiter.attack.value = 0.003;
+  limiter.release.value = 0.15;
+  monitorGain = audioContext.createGain();
+  monitorGain.gain.value = 0;
   recordDestination = audioContext.createMediaStreamDestination();
+  robotLfo = audioContext.createOscillator();
+  robotLfo.type = "sine";
+  robotLfo.frequency.value = 26;
+  robotDepth = audioContext.createGain();
+  robotDepth.gain.value = 0;
+  robotLfo.connect(robotDepth);
+  robotDepth.connect(tremoloGain.gain);
+  robotLfo.start();
 
   inputBus.connect(pitchNode);
   pitchNode.connect(highpass);
   highpass.connect(toneFilter);
-  toneFilter.connect(shaper);
+  toneFilter.connect(lowpass);
+  lowpass.connect(shaper);
   shaper.connect(tremoloGain);
 
   tremoloGain.connect(masterGain);
@@ -173,8 +216,10 @@ async function ensureAudio() {
   convolver.connect(reverbWet);
   reverbWet.connect(masterGain);
 
-  masterGain.connect(audioContext.destination);
-  masterGain.connect(recordDestination);
+  masterGain.connect(limiter);
+  limiter.connect(recordDestination);
+  limiter.connect(monitorGain);
+  monitorGain.connect(audioContext.destination);
 
   startMeter();
   applyPreset("normal");
@@ -209,15 +254,20 @@ function updateSliderLabels() {
 
 function updateEffects() {
   updateSliderLabels();
+ui.inputLevelValue.textContent = ui.inputLevel.value + "%";
+ui.monitorVolumeValue.textContent = ui.monitorVolume.value + "%";
   if (!audioContext) return;
   const pitch = Number(ui.pitch.value);
   if (pitchNode && pitchNode.port) {
     pitchNode.port.postMessage({ ratio: Math.pow(2, pitch / 12) });
   }
-  delayWet.gain.setTargetAtTime(Number(ui.echo.value) / 100 * 0.72, audioContext.currentTime, 0.025);
-  delayFeedback.gain.setTargetAtTime(Number(ui.echo.value) / 100 * 0.48, audioContext.currentTime, 0.025);
+  if (pitchNode && pitchNode.port) pitchNode.port.postMessage({ noiseGate: ui.noiseReduction.checked });
+  delayWet.gain.setTargetAtTime(Number(ui.echo.value) / 100 * 0.55, audioContext.currentTime, 0.025);
+  delayFeedback.gain.setTargetAtTime(Number(ui.echo.value) / 100 * 0.34, audioContext.currentTime, 0.025);
   reverbWet.gain.setTargetAtTime(Number(ui.reverb.value) / 100 * 0.72, audioContext.currentTime, 0.025);
   shaper.curve = makeDistortionCurve(Number(ui.distortion.value) / 100);
+  applyLevelSettings();
+  applyMonitorSettings();
 }
 
 function selectPresetButton(name) {
@@ -236,11 +286,16 @@ function applyPreset(name) {
   selectPresetButton(name);
 
   if (audioContext) {
-    highpass.frequency.setTargetAtTime(config.radio ? 430 : 35, audioContext.currentTime, 0.04);
-    toneFilter.type = config.radio ? "highshelf" : "lowshelf";
-    toneFilter.frequency.setTargetAtTime(config.radio ? 2600 : 180, audioContext.currentTime, 0.04);
-    toneFilter.gain.setTargetAtTime(config.radio ? -13 : (config.deep ? 9 : 0), audioContext.currentTime, 0.04);
-    tremoloGain.gain.setTargetAtTime(config.robot ? 0.9 : 1, audioContext.currentTime, 0.04);
+    highpass.frequency.setTargetAtTime(config.highpass || (config.radio ? 430 : 80), audioContext.currentTime, 0.04);
+    lowpass.frequency.setTargetAtTime(config.lowpass || 18000, audioContext.currentTime, 0.04);
+    toneFilter.type = config.filterType || (config.radio ? "highshelf" : "lowshelf");
+    toneFilter.frequency.setTargetAtTime(config.filterFrequency || (config.radio ? 2600 : 180), audioContext.currentTime, 0.04);
+    toneFilter.gain.setTargetAtTime(config.filterGain !== undefined ? config.filterGain :
+      (config.radio ? -13 : (config.deep ? 6 : 0)), audioContext.currentTime, 0.04);
+    toneFilter.Q.setTargetAtTime(config.filterType === "peaking" ? 1.1 : 0.8, audioContext.currentTime, 0.04);
+    delayNode.delayTime.setTargetAtTime(config.delayTime || 0.28, audioContext.currentTime, 0.04);
+    robotLfo.frequency.setTargetAtTime(config.robotHz || 26, audioContext.currentTime, 0.04);
+    robotDepth.gain.setTargetAtTime(config.robotDepth || 0, audioContext.currentTime, 0.04);
   }
   updateEffects();
 }
@@ -258,11 +313,11 @@ async function switchToMic() {
   }
   stopCurrentInput();
   micStream = await navigator.mediaDevices.getUserMedia({
-    audio: { echoCancellation: false, noiseSuppression: false, autoGainControl: false },
+    audio: { echoCancellation: true, noiseSuppression: ui.noiseReduction.checked, autoGainControl: false, channelCount: 1 },
     video: false
   });
   micSource = audioContext.createMediaStreamSource(micStream);
-  micSource.connect(inputBus);
+  micSource.connect(inputGain);
   currentInput = "mic";
   setStatus(true, "MICRÓFONO ACTIVO");
   ui.sourceHint.textContent = "Micrófono activo. Usa audífonos para evitar acoples.";
@@ -284,6 +339,7 @@ function stopCurrentInput() {
     try { mediaSource.disconnect(); } catch (_) {}
   }
   if (ui.audioPlayer) ui.audioPlayer.pause();
+  if (mediaRecorder && mediaRecorder.state === "recording") stopRecording();
   currentInput = null;
   setStatus(false, "INACTIVO");
   ui.micButton.classList.remove("active");
@@ -303,7 +359,7 @@ async function loadAudioFile(file) {
   ui.audioPlayer.src = objectUrl;
   ui.audioPlayer.hidden = false;
   if (!mediaSource) mediaSource = audioContext.createMediaElementSource(ui.audioPlayer);
-  mediaSource.connect(inputBus);
+  mediaSource.connect(inputGain);
   currentInput = "file";
   setStatus(true, "ARCHIVO LISTO");
   ui.sourceHint.textContent = "Archivo cargado. Pulsa reproducir en el control de audio.";
@@ -311,6 +367,30 @@ async function loadAudioFile(file) {
   ui.startButton.disabled = false;
   ui.stopButton.disabled = false;
   showToast("Audio listo para aplicar efectos.");
+}
+
+function applyLevelSettings() {
+  if (!audioContext) return;
+  inputGain.gain.setTargetAtTime(Number(ui.inputLevel.value) / 100, audioContext.currentTime, 0.04);
+  ui.inputLevelValue.textContent = ui.inputLevel.value + "%";
+  if (ui.autoLevel.checked) {
+    limiter.threshold.setTargetAtTime(-7, audioContext.currentTime, 0.05);
+    limiter.ratio.setTargetAtTime(12, audioContext.currentTime, 0.05);
+  } else {
+    limiter.threshold.setTargetAtTime(-3, audioContext.currentTime, 0.05);
+    limiter.ratio.setTargetAtTime(4, audioContext.currentTime, 0.05);
+  }
+}
+
+function applyMonitorSettings() {
+  const enabled = ui.liveMonitor.checked;
+  const volume = Number(ui.monitorVolume.value) / 100;
+  ui.monitorVolume.disabled = !enabled;
+  ui.monitorVolumeValue.textContent = ui.monitorVolume.value + "%";
+  if (monitorGain && audioContext) {
+    monitorGain.gain.setTargetAtTime(enabled ? Math.min(0.7, volume) : 0, audioContext.currentTime, 0.04);
+  }
+  if (enabled) ui.sourceHint.textContent = "Monitoreo activo. Usa audífonos; los parlantes pueden producir acople.";
 }
 
 function formatTime(seconds) {
@@ -427,6 +507,18 @@ ui.presets.forEach((button) => {
   slider.addEventListener("input", markCustom);
 });
 
+ui.noiseReduction.addEventListener("change", async () => {
+  if (pitchNode && pitchNode.port) pitchNode.port.postMessage({ noiseGate: ui.noiseReduction.checked });
+  if (currentInput === "mic") {
+    try { await switchToMic(); }
+    catch (error) { showToast("No se pudo reiniciar el micrófono: " + error.message); }
+  }
+  showToast(ui.noiseReduction.checked ? "Reducción de ruido activada." : "Reducción de ruido desactivada.");
+});
+ui.autoLevel.addEventListener("change", applyLevelSettings);
+ui.inputLevel.addEventListener("input", applyLevelSettings);
+ui.liveMonitor.addEventListener("change", applyMonitorSettings);
+ui.monitorVolume.addEventListener("input", applyMonitorSettings);
 ui.resetButton.addEventListener("click", () => applyPreset("normal"));
 ui.recordButton.addEventListener("click", () => {
   if (mediaRecorder && mediaRecorder.state === "recording") stopRecording();
