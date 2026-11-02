@@ -5,6 +5,7 @@ on:
   push:
     paths:
       - "voice-changer-with-effects.xapk"
+      - ".github/scripts/inspect_xapk.py"
 
 permissions:
   contents: read
