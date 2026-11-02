@@ -71,6 +71,7 @@ const presets = {
   megaphone:  { pitch: 0, echo: 0, reverb: 0, distortion: 28, highpass: 500, lowpass: 4300, filterType: "peaking", filterFrequency: 1300, filterGain: 6 },
   chorus:     { pitch: 0, echo: 22, reverb: 42, distortion: 0, delayTime: 0.045, highpass: 70, lowpass: 11000 },
   cyborg:     { pitch: 2, echo: 15, reverb: 8, distortion: 48, robotHz: 34, robotDepth: 0.16, highpass: 140, lowpass: 6500 }
+};
 
 function showToast(message) {
   ui.toast.textContent = message;
