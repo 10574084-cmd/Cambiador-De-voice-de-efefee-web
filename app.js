@@ -5,7 +5,7 @@ const ui = {
   status: byId("status"), meterBar: byId("meterBar"), meterValue: byId("meterValue"),
   sourceHint: byId("sourceHint"), micButton: byId("micButton"),
   startButton: byId("startButton"), stopButton: byId("stopButton"),
-  audioFile: byId("audioFile"), audioPlayer: byId("audioPlayer"),
+  audioFile: byId("audioFile"), audioPlayer: byId("audioPlayer"), videoFile: byId("videoFile"), videoPlayer: byId("videoPlayer"), videoFilter: byId("videoFilter"), videoIntensity: byId("videoIntensity"), videoHue: byId("videoHue"),
   presets: Array.from(document.querySelectorAll(".preset")),
   pitch: byId("pitch"), echo: byId("echo"), reverb: byId("reverb"),
   distortion: byId("distortion"), lowCut: byId("lowCut"), highCut: byId("highCut"), toneAmount: byId("toneAmount"), modSpeed: byId("modSpeed"), modDepth: byId("modDepth"), delayTime: byId("delayTime"), outputVolume: byId("outputVolume"), pitchValue: byId("pitchValue"),
@@ -17,7 +17,22 @@ const ui = {
   liveMonitor: byId("liveMonitor"), inputLevel: byId("inputLevel"),
   inputLevelValue: byId("inputLevelValue"), monitorVolume: byId("monitorVolume"),
   monitorVolumeValue: byId("monitorVolumeValue"), noiseThreshold: byId("noiseThreshold"),
-  noiseThresholdValue: byId("noiseThresholdValue")
+  noiseThresholdValue: byId("noiseThresholdValue"),
+megabass: {"pitch":-1,"echo":0,"reverb":4,"distortion":12,"filterType":"lowshelf","filterFrequency":140,"filterGain":12},
+whisper: {"pitch":2,"echo":8,"reverb":20,"distortion":0,"highpass":250,"lowpass":9000,"filterGain":-4},
+underwater_radio: {"pitch":-2,"echo":28,"reverb":35,"distortion":8,"highpass":100,"lowpass":1300,"robotHz":7,"robotDepth":0.08},
+cartoon: {"pitch":7,"echo":4,"reverb":8,"distortion":4,"highpass":130,"lowpass":12000},
+telephone_clean: {"pitch":0,"echo":0,"reverb":0,"distortion":0,"highpass":350,"lowpass":3400,"filterType":"peaking","filterFrequency":1700,"filterGain":3},
+distorted_radio: {"pitch":-1,"echo":12,"reverb":8,"distortion":58,"highpass":400,"lowpass":4200},
+dream_voice: {"pitch":2,"echo":38,"reverb":72,"distortion":0,"highpass":100,"lowpass":14000,"filterGain":4},
+echo_chamber: {"pitch":0,"echo":90,"reverb":55,"distortion":0,"delayTime":0.62},
+dark_robot: {"pitch":-6,"echo":15,"reverb":20,"distortion":50,"robotHz":14,"robotDepth":0.3,"lowpass":4200},
+hollow_voice: {"pitch":-2,"echo":18,"reverb":45,"distortion":4,"highpass":180,"lowpass":5000,"filterGain":8},
+tiny_robot: {"pitch":9,"echo":5,"reverb":10,"distortion":34,"robotHz":28,"robotDepth":0.22},
+giant_echo: {"pitch":-10,"echo":72,"reverb":65,"distortion":8,"lowpass":5000},
+underwater_abyss: {"pitch":-5,"echo":32,"reverb":40,"distortion":0,"highpass":50,"lowpass":550},
+bright_room: {"pitch":0,"echo":15,"reverb":25,"distortion":0,"highpass":120,"lowpass":15000,"filterGain":5},
+lofi_radio: {"pitch":0,"echo":5,"reverb":8,"distortion":35,"highpass":250,"lowpass":5000}
 };
 
 let audioContext = null;
@@ -45,6 +60,7 @@ let analyser = null;
 let micStream = null;
 let micSource = null;
 let mediaSource = null;
+let videoSource = null;
 let currentInput = null;
 let mediaRecorder = null;
 let recordedChunks = [];
@@ -443,6 +459,8 @@ function stopCurrentInput() {
     try { mediaSource.disconnect(); } catch (_) {}
   }
   if (ui.audioPlayer) ui.audioPlayer.pause();
+  if (ui.videoPlayer) ui.videoPlayer.pause();
+  if (videoSource) { try { videoSource.disconnect(); } catch (_) {} }
   if (mediaRecorder && mediaRecorder.state === "recording") stopRecording();
   currentInput = null;
   applyMonitorSettings();
@@ -475,6 +493,29 @@ async function loadAudioFile(file) {
   showToast("Audio listo para aplicar efectos.");
 }
 
+async function loadVideoFile(file) {
+  if (!file || !(file.type.startsWith("video/") || /\\.(mp4|webm|mov|m4v)$/i.test(file.name))) {
+    showToast("Selecciona un video MP4, WebM o MOV.");
+    return;
+  }
+  await ensureAudio();
+  stopCurrentInput();
+  if (objectUrl) URL.revokeObjectURL(objectUrl);
+  objectUrl = URL.createObjectURL(file);
+  ui.videoPlayer.src = objectUrl;
+  ui.videoPlayer.hidden = false;
+  ui.audioPlayer.hidden = true;
+  if (!videoSource) videoSource = audioContext.createMediaElementSource(ui.videoPlayer);
+  videoSource.connect(inputGain);
+  currentInput = "video";
+  applyMonitorSettings();
+  setStatus(true, "VIDEO LISTO");
+  ui.sourceHint.textContent = "Video cargado. Reprodúcelo: el audio y los efectos se procesan en vivo.";
+  ui.startButton.disabled = false;
+  ui.stopButton.disabled = false;
+  showToast("Video listo con efectos de audio y video.");
+}
+
 function applyLevelSettings() {
   if (!audioContext) return;
   inputGain.gain.setTargetAtTime(Number(ui.inputLevel.value) / 100, audioContext.currentTime, 0.04);
@@ -491,7 +532,7 @@ function applyLevelSettings() {
 }
 
 function applyMonitorSettings() {
-  const isFile = currentInput === "file";
+  const isFile = currentInput === "file" || currentInput === "video";
   const enabled = isFile || ui.liveMonitor.checked;
   const volume = isFile ? 0.8 : Number(ui.monitorVolume.value) / 100;
   ui.monitorVolume.disabled = !enabled;
@@ -570,7 +611,7 @@ function downloadRecording() {
 
 ui.startButton.addEventListener("click", async () => {
   try {
-    if (currentInput === "file") {
+    if (currentInput === "file" || currentInput === "video") {
       await ui.audioPlayer.play();
       return;
     }
@@ -601,7 +642,7 @@ ui.stopButton.addEventListener("click", () => {
   ui.audioFile.value = "";
 });
 
-ui.audioFile.addEventListener("change", async (event) => {
+ui.videoFile.addEventListener("change", async (event) => {\n  try { await loadVideoFile(event.target.files && event.target.files[0]); }\n  catch (error) { showToast(error.message || "No se pudo cargar el video."); }\n});\n\n[ui.videoFilter, ui.videoIntensity, ui.videoHue].forEach((control) => control.addEventListener("input", applyVideoFilter));\nfunction applyVideoFilter() {\n  if (!ui.videoPlayer) return;\n  const amount = Number(ui.videoIntensity.value) / 100;\n  const filters = { none:"", cinematic:"contrast(1.25) saturate(1.25)", vintage:"sepia(.8) contrast(1.15)", mono:"grayscale(1)", invert:"invert(1)", dream:"blur(1.2px) saturate(1.5) brightness(1.12)", night:"hue-rotate(190deg) saturate(1.5) brightness(.75)", sketch:"grayscale(1) contrast(2.2)", warm:"sepia(.35) saturate(1.5)", cool:"hue-rotate(165deg) saturate(1.25)" };\n  const base = filters[ui.videoFilter.value] || "";\n  ui.videoPlayer.style.filter = base + " hue-rotate(" + (Number(ui.videoHue.value) - 50) * 3.6 + "deg)";\n  ui.videoPlayer.style.opacity = String(.45 + amount * .55);\n}\n\nui.audioFile.addEventListener("change", async (event) => {
   try {
     await loadAudioFile(event.target.files && event.target.files[0]);
   } catch (error) {
