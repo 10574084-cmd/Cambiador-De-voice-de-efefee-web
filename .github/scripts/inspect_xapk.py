@@ -100,3 +100,5 @@ def main():
 
 if __name__ == "__main__":
     main()
+
+# This script reports archive and Android metadata only.
