@@ -494,7 +494,8 @@ async function loadAudioFile(file) {
 }
 
 async function loadVideoFile(file) {
-  if (!file || !(file.type.startsWith("video/") || /\\.(mp4|webm|mov|m4v)$/i.test(file.name))) {
+  const extensionIsVideo = /\.(mp4|webm|mov|m4v)$/i.test(file && file.name || "");
+  if (!file || !(file.type.startsWith("video/") || extensionIsVideo)) {
     showToast("Selecciona un video MP4, WebM o MOV.");
     return;
   }
@@ -502,18 +503,23 @@ async function loadVideoFile(file) {
   stopCurrentInput();
   if (objectUrl) URL.revokeObjectURL(objectUrl);
   objectUrl = URL.createObjectURL(file);
+  ui.videoPlayer.pause();
+  ui.videoPlayer.removeAttribute("src");
+  ui.videoPlayer.load();
   ui.videoPlayer.src = objectUrl;
   ui.videoPlayer.hidden = false;
   ui.audioPlayer.hidden = true;
   if (!videoSource) videoSource = audioContext.createMediaElementSource(ui.videoPlayer);
+  try { videoSource.disconnect(); } catch (_) {}
   videoSource.connect(inputGain);
+  applyVideoFilter();
   currentInput = "video";
   applyMonitorSettings();
   setStatus(true, "VIDEO LISTO");
-  ui.sourceHint.textContent = "Video cargado. Reprodúcelo: el audio y los efectos se procesan en vivo.";
+  ui.sourceHint.textContent = "Video cargado. Pulsa reproducir; el audio pasará por los efectos.";
   ui.startButton.disabled = false;
   ui.stopButton.disabled = false;
-  showToast("Video listo con efectos de audio y video.");
+  showToast("Video cargado. Si no reproduce, puede que su códec no sea compatible.");
 }
 
 function applyLevelSettings() {
