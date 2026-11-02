@@ -6,7 +6,7 @@
   <meta name="theme-color" content="#100d20">
   <meta name="description" content="Cambiador de voz web con efectos en tiempo real.">
   <title>Voice Lab — Cambiador de voz</title>
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="style.css?v=1.2.1">
 </head>
 <body>
   <main class="shell">
@@ -15,7 +15,7 @@
         <span class="brand-icon">VL</span>
         <span>VOICE<span class="brand-accent">LAB</span><small>CAMBIADOR DE VOZ WEB</small></span>
       </a>
-      <span class="version">WEB EDITION · 1.0</span>
+      <span class="version">WEB EDITION · 1.2.1</span>
     </header>
 
     <section class="hero">
@@ -48,7 +48,8 @@
           <label class="check-row"><input id="noiseReduction" type="checkbox" checked><span><b>Reducir ruido de fondo</b><small>Supresión del navegador + puerta de ruido</small></span></label>
           <label class="check-row"><input id="autoLevel" type="checkbox" checked><span><b>Control automático de nivel</b><small>Compresión suave para evitar picos</small></span></label>
           <label class="check-row"><input id="liveMonitor" type="checkbox"><span><b>Escuchar micrófono en vivo</b><small>Apagado por defecto para evitar acoples</small></span></label>
-          <label class="slider-row compact"><span><b>Sensibilidad</b><small id="inputLevelValue">75%</small></span><input id="inputLevel" type="range" min="25" max="100" value="75"></label>
+          <label class="slider-row compact"><span><b>Sensibilidad</b><small id="inputLevelValue">65%</small></span><input id="inputLevel" type="range" min="10" max="150" value="65"></label>
+          <label class="slider-row compact"><span><b>Umbral de ruido</b><small id="noiseThresholdValue">25%</small></span><input id="noiseThreshold" type="range" min="0" max="100" value="25"></label>
           <label class="slider-row compact"><span><b>Volumen de escucha</b><small id="monitorVolumeValue">20%</small></span><input id="monitorVolume" type="range" min="0" max="70" value="20" disabled></label>
         </div>
         <p class="hint" id="sourceHint">Pulsa «Activar micrófono» para comenzar. El navegador solicitará permiso.</p>
@@ -110,6 +111,6 @@
     </footer>
     <div id="toast" class="toast" role="status" aria-live="polite"></div>
   </main>
-  <script src="app.js"></script>
+  <script src="app.js?v=1.2.1"></script>
 </body>
 </html>
