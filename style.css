@@ -174,3 +174,9 @@ footer{padding:16px;color:#999;font-size:9px;display:flex;justify-content:space-
 .list-heading{background:#fff;padding:14px 16px 9px}
 .record-panel{border-top:1px solid #eee}
 @media(min-width:761px){.app{width:min(100%,560px)}.android-nav{width:min(100%,560px)}}
+
+/* Fix: effect cards must stay horizontal like the Android reference. */
+.effects-list .effect-row.preset{display:flex;flex-direction:row;align-items:center;justify-content:flex-start;text-align:left;}
+.effects-list .effect-row.preset .effect-art{flex:0 0 43px;margin:0;}
+.effects-list .effect-row.preset .effect-name{flex:1;min-width:0;text-align:left;}
+.effects-list .effect-row.preset .effect-check{flex:0 0 28px;margin-left:auto;}
