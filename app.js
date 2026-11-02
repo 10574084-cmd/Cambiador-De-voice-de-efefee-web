@@ -13,7 +13,7 @@ const ui = {
   distortionValue: byId("distortionValue"), resetButton: byId("resetButton"),
   recordButton: byId("recordButton"), downloadButton: byId("downloadButton"),
   recordTime: byId("recordTime"), toast: byId("toast"), engineLabel: byId("engineLabel"),
-  noiseReduction: byId("noiseReduction"), autoLevel: byId("autoLevel"),
+  noiseReduction: byId("noiseReduction"), softGate: byId("softGate"), autoLevel: byId("autoLevel"),
   liveMonitor: byId("liveMonitor"), inputLevel: byId("inputLevel"),
   inputLevelValue: byId("inputLevelValue"), monitorVolume: byId("monitorVolume"),
   monitorVolumeValue: byId("monitorVolumeValue"), noiseThreshold: byId("noiseThreshold"),
@@ -141,7 +141,7 @@ async function ensureAudio() {
   inputBus.connect(analyser);
 
   try {
-    await audioContext.audioWorklet.addModule("pitch-shifter.js?v=1.2.1");
+    await audioContext.audioWorklet.addModule("pitch-shifter.js?v=1.2.2");
     pitchNode = new AudioWorkletNode(audioContext, "pitch-shifter", {
       numberOfInputs: 1,
       numberOfOutputs: 1,
@@ -272,7 +272,7 @@ ui.monitorVolumeValue.textContent = ui.monitorVolume.value + "%";
     pitchNode.port.postMessage({ ratio: Math.pow(2, pitch / 12) });
   }
   if (pitchNode && pitchNode.port) pitchNode.port.postMessage({
-    noiseGate: ui.noiseReduction.checked,
+    noiseGate: ui.softGate.checked,
     noiseThreshold: 0.0015 + (Number(ui.noiseThreshold.value) / 100) * 0.014
   });
   delayWet.gain.setTargetAtTime(Number(ui.echo.value) / 100 * 0.55, audioContext.currentTime, 0.025);
@@ -528,12 +528,15 @@ ui.presets.forEach((button) => {
 });
 
 ui.noiseReduction.addEventListener("change", async () => {
-  if (pitchNode && pitchNode.port) pitchNode.port.postMessage({ noiseGate: ui.noiseReduction.checked });
   if (currentInput === "mic") {
     try { await switchToMic(); }
     catch (error) { showToast("No se pudo reiniciar el micrófono: " + error.message); }
   }
-  showToast(ui.noiseReduction.checked ? "Reducción de ruido activada." : "Reducción de ruido desactivada.");
+  showToast(ui.noiseReduction.checked ? "Supresión del navegador activada." : "Supresión del navegador desactivada.");
+});
+ui.softGate.addEventListener("change", () => {
+  if (pitchNode && pitchNode.port) pitchNode.port.postMessage({ noiseGate: ui.softGate.checked });
+  showToast(ui.softGate.checked ? "Puerta de ruido suave activada." : "Puerta de ruido desactivada para conservar la voz.");
 });
 ui.autoLevel.addEventListener("change", applyLevelSettings);
 ui.inputLevel.addEventListener("input", applyLevelSettings);
