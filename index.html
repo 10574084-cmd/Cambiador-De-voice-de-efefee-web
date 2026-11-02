@@ -6,7 +6,7 @@
   <meta name="theme-color" content="#100d20">
   <meta name="description" content="Cambiador de voz web con efectos en tiempo real.">
   <title>Voice Lab — Cambiador de voz</title>
-  <link rel="stylesheet" href="style.css?v=1.2.1">
+  <link rel="stylesheet" href="style.css?v=1.2.2">
 </head>
 <body>
   <main class="shell">
@@ -15,7 +15,7 @@
         <span class="brand-icon">VL</span>
         <span>VOICE<span class="brand-accent">LAB</span><small>CAMBIADOR DE VOZ WEB</small></span>
       </a>
-      <span class="version">WEB EDITION · 1.2.1</span>
+      <span class="version">WEB EDITION · 1.2.2</span>
     </header>
 
     <section class="hero">
@@ -45,7 +45,8 @@
           <div class="meter"><div id="meterBar"></div></div>
         </div>
         <div class="audio-options">
-          <label class="check-row"><input id="noiseReduction" type="checkbox" checked><span><b>Reducir ruido de fondo</b><small>Supresión del navegador + puerta de ruido</small></span></label>
+          <label class="check-row"><input id="noiseReduction" type="checkbox" checked><span><b>Reducir ruido de fondo</b><small>Supresión de ruido del navegador</small></span></label>
+          <label class="check-row"><input id="softGate" type="checkbox"><span><b>Puerta de ruido suave</b><small>Reduce el ruido entre frases; apagada para evitar cortes</small></span></label>
           <label class="check-row"><input id="autoLevel" type="checkbox" checked><span><b>Control automático de nivel</b><small>Compresión suave para evitar picos</small></span></label>
           <label class="check-row"><input id="liveMonitor" type="checkbox"><span><b>Escuchar micrófono en vivo</b><small>Apagado por defecto para evitar acoples</small></span></label>
           <label class="slider-row compact"><span><b>Sensibilidad</b><small id="inputLevelValue">65%</small></span><input id="inputLevel" type="range" min="10" max="150" value="65"></label>
@@ -111,6 +112,6 @@
     </footer>
     <div id="toast" class="toast" role="status" aria-live="polite"></div>
   </main>
-  <script src="app.js?v=1.2.1"></script>
+  <script src="app.js?v=1.2.2"></script>
 </body>
 </html>
