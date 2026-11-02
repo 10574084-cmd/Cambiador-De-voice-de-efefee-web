@@ -642,7 +642,22 @@ ui.stopButton.addEventListener("click", () => {
   ui.audioFile.value = "";
 });
 
-ui.videoFile.addEventListener("change", async (event) => {\n  try { await loadVideoFile(event.target.files && event.target.files[0]); }\n  catch (error) { showToast(error.message || "No se pudo cargar el video."); }\n});\n\n[ui.videoFilter, ui.videoIntensity, ui.videoHue].forEach((control) => control.addEventListener("input", applyVideoFilter));\nfunction applyVideoFilter() {\n  if (!ui.videoPlayer) return;\n  const amount = Number(ui.videoIntensity.value) / 100;\n  const filters = { none:"", cinematic:"contrast(1.25) saturate(1.25)", vintage:"sepia(.8) contrast(1.15)", mono:"grayscale(1)", invert:"invert(1)", dream:"blur(1.2px) saturate(1.5) brightness(1.12)", night:"hue-rotate(190deg) saturate(1.5) brightness(.75)", sketch:"grayscale(1) contrast(2.2)", warm:"sepia(.35) saturate(1.5)", cool:"hue-rotate(165deg) saturate(1.25)" };\n  const base = filters[ui.videoFilter.value] || "";\n  ui.videoPlayer.style.filter = base + " hue-rotate(" + (Number(ui.videoHue.value) - 50) * 3.6 + "deg)";\n  ui.videoPlayer.style.opacity = String(.45 + amount * .55);\n}\n\nui.audioFile.addEventListener("change", async (event) => {
+ui.videoFile.addEventListener("change", async (event) => {
+  try { await loadVideoFile(event.target.files && event.target.files[0]); }
+  catch (error) { showToast(error.message || "No se pudo cargar el video."); }
+});
+
+[ui.videoFilter, ui.videoIntensity, ui.videoHue].forEach((control) => control.addEventListener("input", applyVideoFilter));
+function applyVideoFilter() {
+  if (!ui.videoPlayer) return;
+  const amount = Number(ui.videoIntensity.value) / 100;
+  const filters = { none:"", cinematic:"contrast(1.25) saturate(1.25)", vintage:"sepia(.8) contrast(1.15)", mono:"grayscale(1)", invert:"invert(1)", dream:"blur(1.2px) saturate(1.5) brightness(1.12)", night:"hue-rotate(190deg) saturate(1.5) brightness(.75)", sketch:"grayscale(1) contrast(2.2)", warm:"sepia(.35) saturate(1.5)", cool:"hue-rotate(165deg) saturate(1.25)" };
+  const base = filters[ui.videoFilter.value] || "";
+  ui.videoPlayer.style.filter = base + " hue-rotate(" + (Number(ui.videoHue.value) - 50) * 3.6 + "deg)";
+  ui.videoPlayer.style.opacity = String(.45 + amount * .55);
+}
+
+ui.audioFile.addEventListener("change", async (event) => {
   try {
     await loadAudioFile(event.target.files && event.target.files[0]);
   } catch (error) {
