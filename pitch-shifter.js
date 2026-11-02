@@ -10,7 +10,7 @@ class PitchShifterProcessor extends AudioWorkletProcessor {
     this.span = this.maxDelay - this.minDelay;
     this.phase = 0;
     this.noiseGate = true;
-    this.noiseThreshold = 0.0055;
+    this.noiseThreshold = 0.005;
     this.envelope = 0;
     this.gateGain = 1;
     this.attack = Math.exp(-1 / (sampleRate * 0.008));
@@ -22,6 +22,9 @@ class PitchShifterProcessor extends AudioWorkletProcessor {
       }
       if (typeof data.noiseGate === "boolean") {
         this.noiseGate = data.noiseGate;
+      }
+      if (Number.isFinite(data.noiseThreshold)) {
+        this.noiseThreshold = Math.max(0.0005, Math.min(0.03, data.noiseThreshold));
       }
     };
   }
