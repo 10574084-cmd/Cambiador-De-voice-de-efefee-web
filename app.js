@@ -12,7 +12,7 @@ const ui = {
   echoValue: byId("echoValue"), reverbValue: byId("reverbValue"),
   distortionValue: byId("distortionValue"), resetButton: byId("resetButton"),
   recordButton: byId("recordButton"), downloadButton: byId("downloadButton"),
-  recordTime: byId("recordTime"), toast: byId("toast")
+  recordTime: byId("recordTime"), toast: byId("toast"), engineLabel: byId("engineLabel")
 };
 
 let audioContext = null;
@@ -46,7 +46,7 @@ let toastTimer = null;
 
 const presets = {
   normal: { pitch: 0, echo: 0, reverb: 0, distortion: 0 },
-  robot:  { pitch: -1, echo: 8, reverb: 0, distortion: 76 },
+  robot:  { pitch: -1, echo: 8, reverb: 0, distortion: 76, robot: true },
   radio:  { pitch: 0, echo: 0, reverb: 5, distortion: 20, radio: true },
   echo:   { pitch: 0, echo: 76, reverb: 10, distortion: 0 },
   cave:   { pitch: 0, echo: 34, reverb: 84, distortion: 0 },
