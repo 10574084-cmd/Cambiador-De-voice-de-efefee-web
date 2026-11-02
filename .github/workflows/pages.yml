@@ -17,7 +17,7 @@ permissions:
   id-token: write
 
 concurrency:
-  group: github-pages
+  group: github-pages-voice-lab
   cancel-in-progress: true
 
 jobs:
