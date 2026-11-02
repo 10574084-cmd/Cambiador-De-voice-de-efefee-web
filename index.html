@@ -44,6 +44,13 @@
           <div class="meter-label"><span>NIVEL DE ENTRADA</span><span id="meterValue">0%</span></div>
           <div class="meter"><div id="meterBar"></div></div>
         </div>
+        <div class="audio-options">
+          <label class="check-row"><input id="noiseReduction" type="checkbox" checked><span><b>Reducir ruido de fondo</b><small>Supresión del navegador + puerta de ruido</small></span></label>
+          <label class="check-row"><input id="autoLevel" type="checkbox" checked><span><b>Control automático de nivel</b><small>Compresión suave para evitar picos</small></span></label>
+          <label class="check-row"><input id="liveMonitor" type="checkbox"><span><b>Escuchar micrófono en vivo</b><small>Apagado por defecto para evitar acoples</small></span></label>
+          <label class="slider-row compact"><span><b>Sensibilidad</b><small id="inputLevelValue">75%</small></span><input id="inputLevel" type="range" min="25" max="100" value="75"></label>
+          <label class="slider-row compact"><span><b>Volumen de escucha</b><small id="monitorVolumeValue">20%</small></span><input id="monitorVolume" type="range" min="0" max="70" value="20" disabled></label>
+        </div>
         <p class="hint" id="sourceHint">Pulsa «Activar micrófono» para comenzar. El navegador solicitará permiso.</p>
         <button id="startButton" class="primary-button" type="button">Activar micrófono <span>→</span></button>
         <button id="stopButton" class="quiet-button" type="button" disabled>Detener entrada</button>
@@ -63,6 +70,14 @@
           <button class="preset" data-preset="helium" type="button"><span>↑</span><b>Agudo</b><small>Ligero</small></button>
           <button class="preset" data-preset="deep" type="button"><span>↓</span><b>Grave</b><small>Profundo</small></button>
           <button class="preset" data-preset="alien" type="button"><span>✧</span><b>Alien</b><small>Extraterrestre</small></button>
+          <button class="preset" data-preset="chipmunk" type="button"><span>↟</span><b>Ardilla</b><small>Muy agudo</small></button>
+          <button class="preset" data-preset="monster" type="button"><span>♟</span><b>Monstruo</b><small>Voz oscura</small></button>
+          <button class="preset" data-preset="telephone" type="button"><span>☎</span><b>Teléfono</b><small>Banda estrecha</small></button>
+          <button class="preset" data-preset="underwater" type="button"><span>≈</span><b>Bajo agua</b><small>Filtro suave</small></button>
+          <button class="preset" data-preset="ghost" type="button"><span>☾</span><b>Fantasma</b><small>Etéreo</small></button>
+          <button class="preset" data-preset="megaphone" type="button"><span>📢</span><b>Megáfono</b><small>Altavoz</small></button>
+          <button class="preset" data-preset="chorus" type="button"><span>♬</span><b>Coro</b><small>Eco ancho</small></button>
+          <button class="preset" data-preset="cyborg" type="button"><span>⌘</span><b>Cyborg</b><small>Digital</small></button>
         </div>
 
         <div class="sliders">
