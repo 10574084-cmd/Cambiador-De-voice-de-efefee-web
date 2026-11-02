@@ -16,12 +16,14 @@ const ui = {
   noiseReduction: byId("noiseReduction"), autoLevel: byId("autoLevel"),
   liveMonitor: byId("liveMonitor"), inputLevel: byId("inputLevel"),
   inputLevelValue: byId("inputLevelValue"), monitorVolume: byId("monitorVolume"),
-  monitorVolumeValue: byId("monitorVolumeValue")
+  monitorVolumeValue: byId("monitorVolumeValue"), noiseThreshold: byId("noiseThreshold"),
+  noiseThresholdValue: byId("noiseThresholdValue")
 };
 
 let audioContext = null;
 let inputBus = null;
 let inputGain = null;
+let inputCompressor = null;
 let pitchNode = null;
 let highpass = null;
 let lowpass = null;
@@ -125,14 +127,21 @@ async function ensureAudio() {
 
   inputGain = audioContext.createGain();
   inputGain.gain.value = Number(ui.inputLevel.value) / 100;
+  inputCompressor = audioContext.createDynamicsCompressor();
+  inputCompressor.threshold.value = -22;
+  inputCompressor.knee.value = 12;
+  inputCompressor.ratio.value = 3;
+  inputCompressor.attack.value = 0.006;
+  inputCompressor.release.value = 0.16;
   inputBus = audioContext.createGain();
-  inputGain.connect(inputBus);
+  inputGain.connect(inputCompressor);
+  inputCompressor.connect(inputBus);
   analyser = audioContext.createAnalyser();
   analyser.fftSize = 1024;
   inputBus.connect(analyser);
 
   try {
-    await audioContext.audioWorklet.addModule("pitch-shifter.js");
+    await audioContext.audioWorklet.addModule("pitch-shifter.js?v=1.2.1");
     pitchNode = new AudioWorkletNode(audioContext, "pitch-shifter", {
       numberOfInputs: 1,
       numberOfOutputs: 1,
@@ -223,7 +232,7 @@ async function ensureAudio() {
   monitorGain.connect(audioContext.destination);
 
   startMeter();
-  applyPreset("normal");
+  applyPreset(currentPreset);
 }
 
 function startMeter() {
@@ -262,7 +271,10 @@ ui.monitorVolumeValue.textContent = ui.monitorVolume.value + "%";
   if (pitchNode && pitchNode.port) {
     pitchNode.port.postMessage({ ratio: Math.pow(2, pitch / 12) });
   }
-  if (pitchNode && pitchNode.port) pitchNode.port.postMessage({ noiseGate: ui.noiseReduction.checked });
+  if (pitchNode && pitchNode.port) pitchNode.port.postMessage({
+    noiseGate: ui.noiseReduction.checked,
+    noiseThreshold: 0.0015 + (Number(ui.noiseThreshold.value) / 100) * 0.014
+  });
   delayWet.gain.setTargetAtTime(Number(ui.echo.value) / 100 * 0.55, audioContext.currentTime, 0.025);
   delayFeedback.gain.setTargetAtTime(Number(ui.echo.value) / 100 * 0.34, audioContext.currentTime, 0.025);
   reverbWet.gain.setTargetAtTime(Number(ui.reverb.value) / 100 * 0.72, audioContext.currentTime, 0.025);
@@ -314,7 +326,7 @@ async function switchToMic() {
   }
   stopCurrentInput();
   micStream = await navigator.mediaDevices.getUserMedia({
-    audio: { echoCancellation: true, noiseSuppression: ui.noiseReduction.checked, autoGainControl: false, channelCount: 1 },
+    audio: { echoCancellation: true, noiseSuppression: ui.noiseReduction.checked, autoGainControl: ui.autoLevel.checked, channelCount: 1 },
     video: false
   });
   micSource = audioContext.createMediaStreamSource(micStream);
@@ -373,6 +385,8 @@ async function loadAudioFile(file) {
 function applyLevelSettings() {
   if (!audioContext) return;
   inputGain.gain.setTargetAtTime(Number(ui.inputLevel.value) / 100, audioContext.currentTime, 0.04);
+  inputCompressor.threshold.setTargetAtTime(ui.autoLevel.checked ? -22 : -8, audioContext.currentTime, 0.05);
+  inputCompressor.ratio.setTargetAtTime(ui.autoLevel.checked ? 3 : 1.5, audioContext.currentTime, 0.05);
   ui.inputLevelValue.textContent = ui.inputLevel.value + "%";
   if (ui.autoLevel.checked) {
     limiter.threshold.setTargetAtTime(-7, audioContext.currentTime, 0.05);
@@ -384,14 +398,16 @@ function applyLevelSettings() {
 }
 
 function applyMonitorSettings() {
-  const enabled = ui.liveMonitor.checked;
-  const volume = Number(ui.monitorVolume.value) / 100;
+  const isFile = currentInput === "file";
+  const enabled = isFile || ui.liveMonitor.checked;
+  const volume = isFile ? 0.8 : Number(ui.monitorVolume.value) / 100;
   ui.monitorVolume.disabled = !enabled;
   ui.monitorVolumeValue.textContent = ui.monitorVolume.value + "%";
+  ui.noiseThresholdValue.textContent = ui.noiseThreshold.value + "%";
   if (monitorGain && audioContext) {
-    monitorGain.gain.setTargetAtTime(enabled ? Math.min(0.7, volume) : 0, audioContext.currentTime, 0.04);
+    monitorGain.gain.setTargetAtTime(enabled ? Math.min(isFile ? 0.8 : 0.12, volume) : 0, audioContext.currentTime, 0.04);
   }
-  if (enabled) ui.sourceHint.textContent = "Monitoreo activo. Usa audífonos; los parlantes pueden producir acople.";
+  if (enabled && !isFile) ui.sourceHint.textContent = "Monitoreo de micrófono activo a volumen bajo. Usa audífonos; los parlantes pueden producir pitido.";
 }
 
 function formatTime(seconds) {
@@ -518,6 +534,12 @@ ui.noiseReduction.addEventListener("change", async () => {
 });
 ui.autoLevel.addEventListener("change", applyLevelSettings);
 ui.inputLevel.addEventListener("input", applyLevelSettings);
+ui.noiseThreshold.addEventListener("input", () => {
+  ui.noiseThresholdValue.textContent = ui.noiseThreshold.value + "%";
+  if (pitchNode && pitchNode.port) pitchNode.port.postMessage({
+    noiseThreshold: 0.0015 + (Number(ui.noiseThreshold.value) / 100) * 0.014
+  });
+});
 ui.liveMonitor.addEventListener("change", applyMonitorSettings);
 ui.monitorVolume.addEventListener("input", applyMonitorSettings);
 ui.resetButton.addEventListener("click", () => applyPreset("normal"));
