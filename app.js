@@ -570,3 +570,19 @@ window.addEventListener("beforeunload", () => {
 });
 
 updateSliderLabels();
+
+const settingsShortcut = document.getElementById("settingsShortcut");
+const settingsPanel = document.getElementById("settingsPanel");
+const saveShortcut = document.getElementById("saveShortcut");
+if (settingsShortcut && settingsPanel) {
+  settingsShortcut.addEventListener("click", () => {
+    settingsPanel.classList.toggle("open");
+    if (settingsPanel.classList.contains("open")) settingsPanel.scrollIntoView({behavior:"smooth",block:"start"});
+  });
+}
+if (saveShortcut) {
+  saveShortcut.addEventListener("click", () => {
+    const panel = document.querySelector(".record-panel");
+    if (panel) panel.scrollIntoView({behavior:"smooth",block:"center"});
+  });
+}
