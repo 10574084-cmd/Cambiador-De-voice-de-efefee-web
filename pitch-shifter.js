@@ -10,11 +10,11 @@ class PitchShifterProcessor extends AudioWorkletProcessor {
     this.span = this.maxDelay - this.minDelay;
     this.phase = 0;
     this.noiseGate = true;
-    this.noiseThreshold = 0.005;
+    this.noiseThreshold = 0.003;
     this.envelope = 0;
     this.gateGain = 1;
     this.attack = Math.exp(-1 / (sampleRate * 0.008));
-    this.release = Math.exp(-1 / (sampleRate * 0.16));
+    this.release = Math.exp(-1 / (sampleRate * 0.32));
     this.port.onmessage = (event) => {
       const data = event.data || {};
       if (Number.isFinite(data.ratio)) {
@@ -55,7 +55,7 @@ class PitchShifterProcessor extends AudioWorkletProcessor {
       const level = Math.max(Math.abs(leftIn), Math.abs(rightIn));
       const smoothing = level > this.envelope ? this.attack : this.release;
       this.envelope = smoothing * this.envelope + (1 - smoothing) * level;
-      const gateTarget = !this.noiseGate || this.envelope >= this.noiseThreshold ? 1 : 0;
+      const gateTarget = !this.noiseGate || this.envelope >= this.noiseThreshold ? 1 : 0.62;
       const gateSmoothing = gateTarget > this.gateGain ? this.attack : this.release;
       this.gateGain = gateSmoothing * this.gateGain + (1 - gateSmoothing) * gateTarget;
 
