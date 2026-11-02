@@ -326,12 +326,13 @@ async function switchToMic() {
   }
   stopCurrentInput();
   micStream = await navigator.mediaDevices.getUserMedia({
-    audio: { echoCancellation: true, noiseSuppression: ui.noiseReduction.checked, autoGainControl: ui.autoLevel.checked, channelCount: 1 },
+    audio: { echoCancellation: true, noiseSuppression: ui.noiseReduction.checked, autoGainControl: false, channelCount: 1 },
     video: false
   });
   micSource = audioContext.createMediaStreamSource(micStream);
   micSource.connect(inputGain);
   currentInput = "mic";
+  applyMonitorSettings();
   setStatus(true, "MICRÓFONO ACTIVO");
   ui.sourceHint.textContent = "Micrófono activo. Usa audífonos para evitar acoples.";
   ui.micButton.classList.add("active");
@@ -354,6 +355,7 @@ function stopCurrentInput() {
   if (ui.audioPlayer) ui.audioPlayer.pause();
   if (mediaRecorder && mediaRecorder.state === "recording") stopRecording();
   currentInput = null;
+  applyMonitorSettings();
   setStatus(false, "INACTIVO");
   ui.micButton.classList.remove("active");
   ui.meterBar.style.width = "0%";
@@ -374,6 +376,7 @@ async function loadAudioFile(file) {
   if (!mediaSource) mediaSource = audioContext.createMediaElementSource(ui.audioPlayer);
   mediaSource.connect(inputGain);
   currentInput = "file";
+  applyMonitorSettings();
   setStatus(true, "ARCHIVO LISTO");
   ui.sourceHint.textContent = "Archivo cargado. Pulsa reproducir en el control de audio.";
   ui.micButton.classList.remove("active");
