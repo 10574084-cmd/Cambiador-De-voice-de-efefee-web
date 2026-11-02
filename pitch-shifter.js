@@ -9,9 +9,19 @@ class PitchShifterProcessor extends AudioWorkletProcessor {
     this.maxDelay = 0.115;
     this.span = this.maxDelay - this.minDelay;
     this.phase = 0;
+    this.noiseGate = true;
+    this.noiseThreshold = 0.0055;
+    this.envelope = 0;
+    this.gateGain = 1;
+    this.attack = Math.exp(-1 / (sampleRate * 0.008));
+    this.release = Math.exp(-1 / (sampleRate * 0.16));
     this.port.onmessage = (event) => {
-      if (event.data && Number.isFinite(event.data.ratio)) {
-        this.ratio = Math.max(0.5, Math.min(2, event.data.ratio));
+      const data = event.data || {};
+      if (Number.isFinite(data.ratio)) {
+        this.ratio = Math.max(0.5, Math.min(2, data.ratio));
+      }
+      if (typeof data.noiseGate === "boolean") {
+        this.noiseGate = data.noiseGate;
       }
     };
   }
@@ -39,9 +49,18 @@ class PitchShifterProcessor extends AudioWorkletProcessor {
       this.buffers[0][this.writeIndex] = leftIn;
       this.buffers[1][this.writeIndex] = rightIn;
 
+      const level = Math.max(Math.abs(leftIn), Math.abs(rightIn));
+      const smoothing = level > this.envelope ? this.attack : this.release;
+      this.envelope = smoothing * this.envelope + (1 - smoothing) * level;
+      const gateTarget = !this.noiseGate || this.envelope >= this.noiseThreshold ? 1 : 0;
+      const gateSmoothing = gateTarget > this.gateGain ? this.attack : this.release;
+      this.gateGain = gateSmoothing * this.gateGain + (1 - gateSmoothing) * gateTarget;
+
+      let leftOut;
+      let rightOut;
       if (Math.abs(this.ratio - 1) < 0.002) {
-        output[0][i] = leftIn;
-        if (channels > 1) output[1][i] = rightIn;
+        leftOut = leftIn;
+        rightOut = rightIn;
       } else {
         const direction = 1 - this.ratio;
         this.phase += direction / (this.span * sampleRate);
@@ -51,13 +70,15 @@ class PitchShifterProcessor extends AudioWorkletProcessor {
         const windowB = 0.5 - 0.5 * Math.cos(2 * Math.PI * phaseB);
         const delayA = (this.minDelay + this.phase * this.span) * sampleRate;
         const delayB = (this.minDelay + phaseB * this.span) * sampleRate;
-        const left = this.read(this.buffers[0], delayA) * windowA +
-                     this.read(this.buffers[0], delayB) * windowB;
-        const right = this.read(this.buffers[1], delayA) * windowA +
-                      this.read(this.buffers[1], delayB) * windowB;
-        output[0][i] = left;
-        if (channels > 1) output[1][i] = right;
+        leftOut = this.read(this.buffers[0], delayA) * windowA +
+                  this.read(this.buffers[0], delayB) * windowB;
+        rightOut = this.read(this.buffers[1], delayA) * windowA +
+                   this.read(this.buffers[1], delayB) * windowB;
       }
+
+      const finalGain = this.noiseGate ? this.gateGain : 1;
+      output[0][i] = leftOut * finalGain;
+      if (channels > 1) output[1][i] = rightOut * finalGain;
       this.writeIndex = (this.writeIndex + 1) % this.size;
     }
     return true;
