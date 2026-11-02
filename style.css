@@ -87,3 +87,70 @@ footer{display:flex;justify-content:space-between;gap:12px;color:#817894;font-si
 .slider-row input:disabled{opacity:.35;cursor:not-allowed}
 .preset-grid{grid-template-columns:repeat(4,minmax(0,1fr))}
 @media(max-width:480px){.preset-grid{grid-template-columns:repeat(4,minmax(0,1fr))}}
+
+/* Voice Changer Android-inspired layout */
+:root{color-scheme:light;--text:#282a2e;--muted:#85888d}
+body{margin:0;background:#e8e9eb;color:var(--text);font-family:Roboto,Arial,sans-serif}
+.app{width:min(100%,760px);min-height:100vh;margin:auto;background:#f5f5f5;padding-bottom:42px;box-shadow:0 0 32px #0002}
+.appbar{height:58px;background:#25272b;color:#fff;display:flex;align-items:center;padding:0 15px;gap:11px;position:sticky;top:0;z-index:4;box-shadow:0 2px 5px #0003}
+.app-logo{width:34px;height:34px;border-radius:50%;display:grid;place-items:center;background:#1689e8;font-size:18px}
+.app-title{font-size:17px;font-weight:500;flex:1}
+.app-icon{border:0;background:transparent;color:#fff;font-size:22px;padding:7px;cursor:pointer}
+.blue-header{height:176px;background:linear-gradient(145deg,#168ee7,#0874d0);display:flex;align-items:center;justify-content:center;flex-direction:column;gap:10px}
+.mic-orbit{width:112px;height:112px;border-radius:50%;background:#ffffff24;border:1px solid #ffffff55;display:grid;place-items:center}
+.big-mic{width:83px;height:83px;border-radius:50%;background:#fff;display:grid;place-items:center;font-size:42px;box-shadow:0 5px 15px #004d9b55}
+.tagline{font-size:9px;letter-spacing:2px;color:#e6f4ff;font-weight:700}
+.source-strip{display:flex;justify-content:center;gap:12px;padding:12px;background:#fff;border-bottom:1px solid #ddd}
+.source-chip{border:1px solid #1688df;color:#0878cb;background:#fff;border-radius:22px;padding:9px 17px;font-size:13px;font-weight:600;cursor:pointer}
+.source-chip.active{background:#e7f3fd}
+.status-line{height:35px;padding:0 17px;display:flex;align-items:center;justify-content:space-between;color:#777;font-size:10px;font-weight:700;letter-spacing:.8px}
+.level{display:flex;align-items:center;gap:9px}
+.meter{display:block;width:80px;height:5px;border-radius:8px;background:#ddd;overflow:hidden}
+.meter i{display:block;width:0;height:100%;background:#1689e8}
+.list-heading{padding:13px 17px 10px;font-size:13px;font-weight:700;color:#555;background:#f5f5f5}
+.list-heading small{display:block;font-size:11px;font-weight:400;color:#888;margin-top:4px}
+.effects-list{background:#fff}
+.effect-row{width:100%;min-height:62px;border:0;border-bottom:1px solid #e9e9e9;background:#fff;display:flex;align-items:center;text-align:left;padding:8px 13px;gap:12px;cursor:pointer;color:#333}
+.effect-row:hover,.effect-row.selected{background:#f1f8fe}
+.effect-art{width:43px;height:43px;flex:0 0 43px;border-radius:5px;background:linear-gradient(145deg,#f04b52,#d92736);color:#fff;display:grid;place-items:center;font-size:23px;box-shadow:0 2px 4px #0002}
+.effect-name{flex:1;font-size:15px;font-weight:500}
+.effect-name small{display:block;color:#999;font-size:10px;margin-top:3px;font-weight:400}
+.effect-play,.effect-more{width:34px;height:34px;border-radius:50%;background:#1689e8;color:#fff;display:grid;place-items:center;font-size:13px;box-shadow:0 2px 4px #0002}
+.effect-more{background:#eaf4fc;color:#1689e8;font-size:23px;box-shadow:none}
+.control-panel{margin:14px;background:#fff;border-radius:8px;padding:16px;box-shadow:0 1px 4px #0001}
+.control-title{display:flex;align-items:center;justify-content:space-between}
+.control-title h2,.record-panel h2{font-size:16px;margin:0}
+.text-button{border:0;background:transparent;color:#087bd0;font-size:12px;font-weight:700}
+.sliders{display:grid;gap:17px;margin-top:18px}
+.slider-row{display:grid;grid-template-columns:115px 1fr;align-items:center;gap:12px}
+.slider-row span{display:flex;flex-direction:column;gap:4px}
+.slider-row b{font-size:12px}.slider-row small{font-size:10px;color:#888}
+input[type=range]{width:100%;accent-color:#1689e8}
+.audio-options{display:grid;gap:13px;margin-top:20px;padding-top:16px;border-top:1px solid #eee}
+.check-row{display:flex;align-items:flex-start;gap:9px}
+.check-row input{accent-color:#1689e8;margin:2px 0 0}
+.check-row span{display:flex;flex-direction:column;gap:3px}
+.check-row b{font-size:12px}.check-row small{font-size:10px;color:#888}
+.slider-row.compact{grid-template-columns:115px 1fr}
+.slider-row input:disabled{opacity:.35}
+.hint{font-size:11px;color:#777;line-height:1.5;margin:17px 0}
+.source-actions{display:flex;gap:9px}
+.primary-button,.quiet-button,.record-button,.download-button{border:0;border-radius:5px;padding:11px 15px;font-size:12px;font-weight:700;cursor:pointer}
+.primary-button{background:#1689e8;color:white;flex:1}
+.quiet-button{background:#eee;color:#555}
+.primary-button:disabled,.record-button:disabled,.download-button:disabled{opacity:.4;cursor:not-allowed}
+.engine-note{font-size:9px;color:#aaa;margin-top:12px}
+.record-panel{margin:14px;background:#fff;border-radius:8px;padding:16px;display:flex;align-items:center;justify-content:space-between;gap:15px;box-shadow:0 1px 4px #0001}
+.record-panel p{margin:5px 0 0;color:#888;font-size:11px}
+.record-actions{display:flex;align-items:center;gap:7px;flex-wrap:wrap}
+.record-button{background:#e84c56;color:#fff}.record-dot{display:inline-block;width:8px;height:8px;border-radius:50%;background:#fff;margin-right:5px}
+.record-button.recording .record-dot{animation:blink 1s infinite}
+.download-button{background:#1689e8;color:#fff}
+.record-time{font-size:11px;color:#888;font-variant-numeric:tabular-nums}
+@keyframes blink{50%{opacity:.25}}
+footer{padding:16px;color:#999;font-size:9px;display:flex;justify-content:space-between;gap:10px}
+.android-nav{height:30px;background:#24262a;color:#ddd;display:flex;align-items:center;justify-content:space-around;position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:min(100%,760px);font-size:20px;z-index:5}
+.toast{position:fixed;bottom:48px;left:50%;transform:translate(-50%,15px);opacity:0;pointer-events:none;background:#303238;color:#fff;padding:12px 16px;border-radius:6px;font-size:12px;transition:.2s;z-index:8;max-width:90%}
+.toast.show{opacity:1;transform:translate(-50%,0)}
+@media(min-width:761px){.app{margin:18px auto;min-height:calc(100vh - 18px);border-radius:9px;overflow:hidden}.appbar{position:relative}}
+@media(max-width:520px){.app-title{font-size:16px}.blue-header{height:155px}.record-panel{align-items:flex-start;flex-direction:column}.record-actions{width:100%}.record-actions>*{flex:1}footer{flex-direction:column}.slider-row,.slider-row.compact{grid-template-columns:100px 1fr}}
