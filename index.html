@@ -6,7 +6,7 @@
   <meta name="theme-color" content="#25272b">
   <meta name="description" content="Cambiador de voz web con efectos en tiempo real.">
   <title>Voice Changer with Effects — Web</title>
-  <link rel="stylesheet" href="style.css?v=1.3.0">
+  <link rel="stylesheet" href="style.css?v=1.4.0">
 </head>
 <body>
 <main class="app">
@@ -29,7 +29,77 @@
 <button class="effect-row preset" data-preset="ghost" type="button"><span class="effect-art">☾</span><span class="effect-name">Ghost<small>Eco fantasmal</small></span><span class="effect-check">✓</span></button>
 <button class="effect-row preset" data-preset="megaphone" type="button"><span class="effect-art">◖</span><span class="effect-name">Megaphone<small>Efecto megáfono</small></span><span class="effect-check">✓</span></button>
 <button class="effect-row preset" data-preset="chorus" type="button"><span class="effect-art">♫</span><span class="effect-name">Chorus<small>Voz con coro</small></span><span class="effect-check">✓</span></button>
-<button class="effect-row preset" data-preset="normal" type="button"><span class="effect-art">●</span><span class="effect-name">Normal<small>Sin efecto</small></span><span class="effect-check">✓</span></button></section>
+<button class="effect-row preset" data-preset="normal" type="button"><span class="effect-art">●</span><span class="effect-name">Normal<small>Sin efecto</small></span><span class="effect-check">✓</span></button><button class="effect-row preset" data-preset="radio_old" type="button"><span class="effect-art">✦</span><span class="effect-name">Radio antigua<small>Voz AM</small></span><span class="effect-check">✓</span></button>
+<button class="effect-row preset" data-preset="radio_fm" type="button"><span class="effect-art">✦</span><span class="effect-name">Radio FM<small>Voz clara de emisora</small></span><span class="effect-check">✓</span></button>
+<button class="effect-row preset" data-preset="walkie_talkie" type="button"><span class="effect-art">✦</span><span class="effect-name">Walkie-talkie<small>Comunicación estrecha</small></span><span class="effect-check">✓</span></button>
+<button class="effect-row preset" data-preset="underwater_deep" type="button"><span class="effect-art">✦</span><span class="effect-name">Bajo el agua profundo<small>Filtro submarino</small></span><span class="effect-check">✓</span></button>
+<button class="effect-row preset" data-preset="underwater_bubbles" type="button"><span class="effect-art">✦</span><span class="effect-name">Burbujas<small>Eco acuático</small></span><span class="effect-check">✓</span></button>
+<button class="effect-row preset" data-preset="space" type="button"><span class="effect-art">✦</span><span class="effect-name">Espacio<small>Eco amplio y brillante</small></span><span class="effect-check">✓</span></button>
+<button class="effect-row preset" data-preset="outer_space" type="button"><span class="effect-art">✦</span><span class="effect-name">Espacio lejano<small>Voz distante</small></span><span class="effect-check">✓</span></button>
+<button class="effect-row preset" data-preset="demon" type="button"><span class="effect-art">✦</span><span class="effect-name">Demonio<small>Voz grave y oscura</small></span><span class="effect-check">✓</span></button>
+<button class="effect-row preset" data-preset="giant" type="button"><span class="effect-art">✦</span><span class="effect-name">Gigante<small>Tono muy grave</small></span><span class="effect-check">✓</span></button>
+<button class="effect-row preset" data-preset="tiny" type="button"><span class="effect-art">✦</span><span class="effect-name"> diminuta<small>Tono muy agudo</small></span><span class="effect-check">✓</span></button>
+<button class="effect-row preset" data-preset="child" type="button"><span class="effect-art">✦</span><span class="effect-name">Infantil<small>Voz aguda y ligera</small></span><span class="effect-check">✓</span></button>
+<button class="effect-row preset" data-preset="old_person" type="button"><span class="effect-art">✦</span><span class="effect-name">Persona mayor<small>Tono bajo y resonante</small></span><span class="effect-check">✓</span></button>
+<button class="effect-row preset" data-preset="opera" type="button"><span class="effect-art">✦</span><span class="effect-name">Ópera<small>Reverb de escenario</small></span><span class="effect-check">✓</span></button>
+<button class="effect-row preset" data-preset="stadium" type="button"><span class="effect-art">✦</span><span class="effect-name">Estadio<small>Eco de multitud</small></span><span class="effect-check">✓</span></button>
+<button class="effect-row preset" data-preset="bathroom" type="button"><span class="effect-art">✦</span><span class="effect-name">Baño<small>Reverberación corta</small></span><span class="effect-check">✓</span></button>
+<button class="effect-row preset" data-preset="tunnel" type="button"><span class="effect-art">✦</span><span class="effect-name">Túnel<small>Repetición cerrada</small></span><span class="effect-check">✓</span></button>
+<button class="effect-row preset" data-preset="cathedral" type="button"><span class="effect-art">✦</span><span class="effect-name">Catedral<small>Reverb larga</small></span><span class="effect-check">✓</span></button>
+<button class="effect-row preset" data-preset="hall" type="button"><span class="effect-art">✦</span><span class="effect-name">Gran salón<small>Eco espacioso</small></span><span class="effect-check">✓</span></button>
+<button class="effect-row preset" data-preset="phone_old" type="button"><span class="effect-art">✦</span><span class="effect-name">Teléfono antiguo<small>Filtro telefónico</small></span><span class="effect-check">✓</span></button>
+<button class="effect-row preset" data-preset="phone_bad" type="button"><span class="effect-art">✦</span><span class="effect-name">Teléfono dañado<small>Radio distorsionada</small></span><span class="effect-check">✓</span></button>
+<button class="effect-row preset" data-preset="vocoder" type="button"><span class="effect-art">✦</span><span class="effect-name">Vocoder<small>Modulación robótica</small></span><span class="effect-check">✓</span></button>
+<button class="effect-row preset" data-preset="robot_slow" type="button"><span class="effect-art">✦</span><span class="effect-name">Robot lento<small>Robot con pulsos lentos</small></span><span class="effect-check">✓</span></button>
+<button class="effect-row preset" data-preset="robot_fast" type="button"><span class="effect-art">✦</span><span class="effect-name">Robot rápido<small>Robot con pulsos rápidos</small></span><span class="effect-check">✓</span></button>
+<button class="effect-row preset" data-preset="droid" type="button"><span class="effect-art">✦</span><span class="effect-name">Droide<small>Voz mecánica</small></span><span class="effect-check">✓</span></button>
+<button class="effect-row preset" data-preset="computer" type="button"><span class="effect-art">✦</span><span class="effect-name">Computadora<small>Voz digital</small></span><span class="effect-check">✓</span></button>
+<button class="effect-row preset" data-preset="glitch" type="button"><span class="effect-art">✦</span><span class="effect-name">Glitch<small>Cortes robóticos suaves</small></span><span class="effect-check">✓</span></button>
+<button class="effect-row preset" data-preset="alien_low" type="button"><span class="effect-art">✦</span><span class="effect-name">Alienígena grave<small>Voz extraterrestre baja</small></span><span class="effect-check">✓</span></button>
+<button class="effect-row preset" data-preset="alien_high" type="button"><span class="effect-art">✦</span><span class="effect-name">Alienígena agudo<small>Voz extraterrestre alta</small></span><span class="effect-check">✓</span></button>
+<button class="effect-row preset" data-preset="space_radio" type="button"><span class="effect-art">✦</span><span class="effect-name">Radio espacial<small>Filtro y eco</small></span><span class="effect-check">✓</span></button>
+<button class="effect-row preset" data-preset="horror" type="button"><span class="effect-art">✦</span><span class="effect-name">Terror<small>Voz oscura con eco</small></span><span class="effect-check">✓</span></button>
+<button class="effect-row preset" data-preset="zombie" type="button"><span class="effect-art">✦</span><span class="effect-name">Zombi<small>Voz grave apagada</small></span><span class="effect-check">✓</span></button>
+<button class="effect-row preset" data-preset="vampire" type="button"><span class="effect-art">✦</span><span class="effect-name">Vampiro<small>Voz profunda</small></span><span class="effect-check">✓</span></button>
+<button class="effect-row preset" data-preset="fairy" type="button"><span class="effect-art">✦</span><span class="effect-name">Hada<small>Tono brillante</small></span><span class="effect-check">✓</span></button>
+<button class="effect-row preset" data-preset="elf" type="button"><span class="effect-art">✦</span><span class="effect-name">Elfo<small>Voz ligera</small></span><span class="effect-check">✓</span></button>
+<button class="effect-row preset" data-preset="squirrel" type="button"><span class="effect-art">✦</span><span class="effect-name">Ardilla<small>Tono muy agudo</small></span><span class="effect-check">✓</span></button>
+<button class="effect-row preset" data-preset="mouse" type="button"><span class="effect-art">✦</span><span class="effect-name">Ratón<small>Voz pequeña</small></span><span class="effect-check">✓</span></button>
+<button class="effect-row preset" data-preset="giant_monster" type="button"><span class="effect-art">✦</span><span class="effect-name">Monstruo gigante<small>Grave con reverb</small></span><span class="effect-check">✓</span></button>
+<button class="effect-row preset" data-preset="distant" type="button"><span class="effect-art">✦</span><span class="effect-name">Lejano<small>Voz con eco distante</small></span><span class="effect-check">✓</span></button>
+<button class="effect-row preset" data-preset="near" type="button"><span class="effect-art">✦</span><span class="effect-name">Cercano<small>Voz seca y presente</small></span><span class="effect-check">✓</span></button>
+<button class="effect-row preset" data-preset="canyon" type="button"><span class="effect-art">✦</span><span class="effect-name">Cañón<small>Repeticiones largas</small></span><span class="effect-check">✓</span></button>
+<button class="effect-row preset" data-preset="mountain" type="button"><span class="effect-art">✦</span><span class="effect-name">Montaña<small>Reverb abierta</small></span><span class="effect-check">✓</span></button>
+<button class="effect-row preset" data-preset="wind" type="button"><span class="effect-art">✦</span><span class="effect-name">Viento<small>Filtro aireado</small></span><span class="effect-check">✓</span></button>
+<button class="effect-row preset" data-preset="underwater_muffled" type="button"><span class="effect-art">✦</span><span class="effect-name">Sumergido<small>Sonido amortiguado</small></span><span class="effect-check">✓</span></button>
+<button class="effect-row preset" data-preset="muffled" type="button"><span class="effect-art">✦</span><span class="effect-name">Amortiguado<small>Frecuencias reducidas</small></span><span class="effect-check">✓</span></button>
+<button class="effect-row preset" data-preset="bright" type="button"><span class="effect-art">✦</span><span class="effect-name">Brillante<small>Agudos realzados</small></span><span class="effect-check">✓</span></button>
+<button class="effect-row preset" data-preset="dark" type="button"><span class="effect-art">✦</span><span class="effect-name">Oscuro<small>Graves realzados</small></span><span class="effect-check">✓</span></button>
+<button class="effect-row preset" data-preset="bass_boost" type="button"><span class="effect-art">✦</span><span class="effect-name">Bajos reforzados<small>Voz con más cuerpo</small></span><span class="effect-check">✓</span></button>
+<button class="effect-row preset" data-preset="treble" type="button"><span class="effect-art">✦</span><span class="effect-name">Agudos<small>Voz más brillante</small></span><span class="effect-check">✓</span></button>
+<button class="effect-row preset" data-preset="distorted" type="button"><span class="effect-art">✦</span><span class="effect-name">Distorsión<small>Saturación marcada</small></span><span class="effect-check">✓</span></button>
+<button class="effect-row preset" data-preset="overdrive" type="button"><span class="effect-art">✦</span><span class="effect-name">Overdrive<small>Saturación intensa</small></span><span class="effect-check">✓</span></button>
+<button class="effect-row preset" data-preset="lofi" type="button"><span class="effect-art">✦</span><span class="effect-name">Lo-fi<small>Sonido envejecido</small></span><span class="effect-check">✓</span></button>
+<button class="effect-row preset" data-preset="vinyl" type="button"><span class="effect-art">✦</span><span class="effect-name">Vinilo<small>Filtro cálido</small></span><span class="effect-check">✓</span></button>
+<button class="effect-row preset" data-preset="megaphone_far" type="button"><span class="effect-art">✦</span><span class="effect-name">Megáfono lejano<small>Voz proyectada</small></span><span class="effect-check">✓</span></button>
+<button class="effect-row preset" data-preset="announcer" type="button"><span class="effect-art">✦</span><span class="effect-name">Locutor<small>Voz de anuncio</small></span><span class="effect-check">✓</span></button>
+<button class="effect-row preset" data-preset="news" type="button"><span class="effect-art">✦</span><span class="effect-name">Noticiero<small>Tono de transmisión</small></span><span class="effect-check">✓</span></button>
+<button class="effect-row preset" data-preset="broadcast" type="button"><span class="effect-art">✦</span><span class="effect-name">Transmisión<small>Compresión y filtro</small></span><span class="effect-check">✓</span></button>
+<button class="effect-row preset" data-preset="double" type="button"><span class="effect-art">✦</span><span class="effect-name">Doble voz<small>Eco corto</small></span><span class="effect-check">✓</span></button>
+<button class="effect-row preset" data-preset="triple_echo" type="button"><span class="effect-art">✦</span><span class="effect-name">Triple eco<small>Varias repeticiones</small></span><span class="effect-check">✓</span></button>
+<button class="effect-row preset" data-preset="slapback" type="button"><span class="effect-art">✦</span><span class="effect-name">Slapback<small>Eco muy corto</small></span><span class="effect-check">✓</span></button>
+<button class="effect-row preset" data-preset="dream" type="button"><span class="effect-art">✦</span><span class="effect-name">Sueño<small>Reverb suave</small></span><span class="effect-check">✓</span></button>
+<button class="effect-row preset" data-preset="dreamy" type="button"><span class="effect-art">✦</span><span class="effect-name">Etéreo<small>Eco y brillo</small></span><span class="effect-check">✓</span></button>
+<button class="effect-row preset" data-preset="haunted" type="button"><span class="effect-art">✦</span><span class="effect-name">Casa embrujada<small>Reverb fantasmal</small></span><span class="effect-check">✓</span></button>
+<button class="effect-row preset" data-preset="underworld" type="button"><span class="effect-art">✦</span><span class="effect-name">Inframundo<small>Voz grave con eco</small></span><span class="effect-check">✓</span></button>
+<button class="effect-row preset" data-preset="hollow" type="button"><span class="effect-art">✦</span><span class="effect-name">Hueco<small>Resonancia cavernosa</small></span><span class="effect-check">✓</span></button>
+<button class="effect-row preset" data-preset="metallic" type="button"><span class="effect-art">✦</span><span class="effect-name">Metálico<small>Timbre mecánico</small></span><span class="effect-check">✓</span></button>
+<button class="effect-row preset" data-preset="synthetic" type="button"><span class="effect-art">✦</span><span class="effect-name">Sintético<small>Modulación digital</small></span><span class="effect-check">✓</span></button>
+<button class="effect-row preset" data-preset="laser" type="button"><span class="effect-art">✦</span><span class="effect-name">Láser<small>Pulso robótico</small></span><span class="effect-check">✓</span></button>
+<button class="effect-row preset" data-preset="telephone_booth" type="button"><span class="effect-art">✦</span><span class="effect-name">Cabina telefónica<small>Banda estrecha</small></span><span class="effect-check">✓</span></button>
+<button class="effect-row preset" data-preset="small_room" type="button"><span class="effect-art">✦</span><span class="effect-name">Cuarto pequeño<small>Reverb discreta</small></span><span class="effect-check">✓</span></button>
+<button class="effect-row preset" data-preset="concert" type="button"><span class="effect-art">✦</span><span class="effect-name">Concierto<small>Eco de escenario</small></span><span class="effect-check">✓</span></button>
+</section>
 <section class="control-panel" id="settingsPanel"><div class="control-title"><h2>Ajustes de sonido</h2><button id="resetButton" class="text-button" type="button">Restablecer</button></div>
 <div class="sliders">
 <label class="slider-row"><span><b>Tono</b><small id="pitchValue">0 semitonos</small></span><input id="pitch" type="range" min="-12" max="12" value="0"></label>
@@ -47,6 +117,6 @@
 <p id="sourceHint" class="hint">Pulsa «Activar micrófono» para comenzar. El navegador solicitará permiso.</p>
 <div class="source-actions"><button id="startButton" class="primary-button" type="button">Activar micrófono</button><button id="stopButton" class="quiet-button" type="button" disabled>Detener</button></div><div class="engine-note" id="engineLabel">Motor Web Audio</div></section>
 <section class="record-panel"><div><h2>Grabación</h2><p>Graba y guarda el audio con el efecto.</p></div><div class="record-actions"><button id="recordButton" class="record-button" type="button" disabled><span class="record-dot"></span> Grabar</button><button id="downloadButton" class="download-button" type="button" disabled>Guardar audio ↓</button><span id="recordTime" class="record-time">00:00</span></div></section>
-<footer><span>VOICE LAB · WEB EDITION 1.3.0</span><span>El audio se procesa localmente en esta pestaña.</span></footer>
+<footer><span>VOICE LAB · WEB EDITION 1.4.0</span><span>El audio se procesa localmente en esta pestaña.</span></footer>
 <div class="android-nav"><span>‹</span><span>○</span><span>▢</span></div><div id="toast" class="toast" role="status" aria-live="polite"></div></main>
-<script src="app.js?v=1.3.0"></script></body>
+<script src="app.js?v=1.4.0"></script></body>
