@@ -343,16 +343,16 @@ function startMeter() {
 function updateSliderLabels() {
   const pitch = Number(ui.pitch.value);
   ui.pitchValue.textContent = (pitch > 0 ? "+" : "") + pitch + " semitonos";
-  ui.echoValue.textContent = ui.echo.value + "%";
-  ui.reverbValue.textContent = ui.reverb.value + "%";
-  ui.distortionValue.textContent = ui.distortion.value + "%";
+  ui.echoValue.textContent = (Number(ui.echo.value) / 10).toFixed(0) + "%";
+  ui.reverbValue.textContent = (Number(ui.reverb.value) / 10).toFixed(0) + "%";
+  ui.distortionValue.textContent = (Number(ui.distortion.value) / 10).toFixed(0) + "%";
   ui.lowCutValue.textContent = ui.lowCut.value + " Hz";
   ui.highCutValue.textContent = Number(ui.highCut.value) >= 18000 ? "Máximo" : ui.highCut.value + " Hz";
   ui.toneAmountValue.textContent = ui.toneAmount.value + " dB";
   ui.modSpeedValue.textContent = ui.modSpeed.value + " Hz";
-  ui.modDepthValue.textContent = ui.modDepth.value + "%";
+  ui.modDepthValue.textContent = (Number(ui.modDepth.value) / 10).toFixed(0) + "%";
   ui.delayTimeValue.textContent = ui.delayTime.value + " ms";
-  ui.outputVolumeValue.textContent = ui.outputVolume.value + "%";
+  ui.outputVolumeValue.textContent = (Number(ui.outputVolume.value) / 10).toFixed(0) + "%";
 }
 
 function updateEffects() {
@@ -368,17 +368,17 @@ ui.monitorVolumeValue.textContent = ui.monitorVolume.value + "%";
     noiseGate: ui.softGate.checked,
     noiseThreshold: 0.0015 + (Number(ui.noiseThreshold.value) / 100) * 0.014
   });
-  delayWet.gain.setTargetAtTime(Number(ui.echo.value) / 100 * 0.55, audioContext.currentTime, 0.025);
-  delayFeedback.gain.setTargetAtTime(Number(ui.echo.value) / 100 * 0.34, audioContext.currentTime, 0.025);
-  reverbWet.gain.setTargetAtTime(Number(ui.reverb.value) / 100 * 0.72, audioContext.currentTime, 0.025);
-  shaper.curve = makeDistortionCurve(Number(ui.distortion.value) / 100);
+  delayWet.gain.setTargetAtTime(Number(ui.echo.value) / 1000 * 0.55, audioContext.currentTime, 0.025);
+  delayFeedback.gain.setTargetAtTime(Number(ui.echo.value) / 1000 * 0.34, audioContext.currentTime, 0.025);
+  reverbWet.gain.setTargetAtTime(Number(ui.reverb.value) / 1000 * 0.72, audioContext.currentTime, 0.025);
+  shaper.curve = makeDistortionCurve(Number(ui.distortion.value) / 1000);
   highpass.frequency.setTargetAtTime(Number(ui.lowCut.value), audioContext.currentTime, 0.03);
   lowpass.frequency.setTargetAtTime(Number(ui.highCut.value), audioContext.currentTime, 0.03);
   toneFilter.gain.setTargetAtTime(Number(ui.toneAmount.value), audioContext.currentTime, 0.03);
   robotLfo.frequency.setTargetAtTime(Number(ui.modSpeed.value), audioContext.currentTime, 0.03);
-  robotDepth.gain.setTargetAtTime(Number(ui.modDepth.value) / 100 * 0.45, audioContext.currentTime, 0.03);
+  robotDepth.gain.setTargetAtTime(Number(ui.modDepth.value) / 1000 * 0.45, audioContext.currentTime, 0.03);
   delayNode.delayTime.setTargetAtTime(Number(ui.delayTime.value) / 1000, audioContext.currentTime, 0.03);
-  masterGain.gain.setTargetAtTime(Number(ui.outputVolume.value) / 100, audioContext.currentTime, 0.03);
+  masterGain.gain.setTargetAtTime(Number(ui.outputVolume.value) / 1000, audioContext.currentTime, 0.03);
   applyLevelSettings();
   applyMonitorSettings();
 }
@@ -393,14 +393,14 @@ function applyPreset(name) {
   const config = presets[name] || presets.normal;
   currentPreset = name;
   ui.pitch.value = String(config.pitch);
-  ui.echo.value = String(config.echo);
-  ui.reverb.value = String(config.reverb);
-  ui.distortion.value = String(config.distortion);
+  ui.echo.value = String(config.echo * 10);
+  ui.reverb.value = String(config.reverb * 10);
+  ui.distortion.value = String(config.distortion * 10);
   ui.lowCut.value = String(config.highpass ?? 80);
   ui.highCut.value = String(config.lowpass ?? 18000);
   ui.toneAmount.value = String(config.filterGain ?? (config.deep ? 6 : config.radio ? -13 : 0));
   ui.modSpeed.value = String(config.robotHz ?? 26);
-  ui.modDepth.value = String(Math.round((config.robotDepth ?? 0) / 0.45 * 100));
+  ui.modDepth.value = String(Math.round((config.robotDepth ?? 0) / 0.45 * 1000));
   ui.delayTime.value = String(Math.round((config.delayTime ?? 0.28) * 1000));
   selectPresetButton(name);
 
